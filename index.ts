@@ -17,5 +17,9 @@ var client = net.connect(
 );
 
 client.on("data", (data) => {
-  console.log("server: ", data.toString("utf8"));
+  console.log(data.toString("utf8"));
+	if(data.includes("PING :")){
+		const token = data.toString().replace("PING :", "")
+		client.write(`PONG ${token}\r\n`)
+	}
 });
