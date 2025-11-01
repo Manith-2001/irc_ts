@@ -1,4 +1,5 @@
-import * as net from "net";
+// import * as net from "net";
+import net = require("net");
 
 interface ClientProps {
   server: string;
@@ -8,13 +9,7 @@ interface ClientProps {
   realname: string;
 }
 
-export function IRCClient({
-  server,
-  port,
-  nick,
-  username,
-  realname,
-}: ClientProps) {
+function IRCClient({ server, port, nick, username, realname }: ClientProps) {
   var client = net.connect(
     {
       host: server,
@@ -30,3 +25,5 @@ export function IRCClient({
   );
   return client;
 }
+
+export = { IRCClient }
