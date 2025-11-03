@@ -19,6 +19,7 @@ class IRCClient implements Client {
   client: Socket.Socket;
   myEmitter: EventEmitter;
   private connectionStatus: boolean;
+  private channels: string[];
 
   constructor(
     server: string,
@@ -28,6 +29,7 @@ class IRCClient implements Client {
     realname: string,
   ) {
     this.connectionStatus = false;
+    this.channels = [];
     this.server = server;
     this.port = port;
     this.nick = nick;
@@ -58,6 +60,10 @@ class IRCClient implements Client {
       } else if (data.includes("MOTD")) {
         console.log("GOT MOTD");
         this.connectionStatus = true;
+      } else if (data.includes("JOIN")) {
+        console.log("joined the room : " + data);
+        let channelName = data.toString("utf-8").split("#").pop();
+        console.log("channel joined : " + channelName);
       } else {
         this.myEmitter.emit("data", data);
       }
@@ -66,18 +72,31 @@ class IRCClient implements Client {
 
   joinChannel(channelName: string): void {
     if (this.connectionStatus) {
-      console.log("connected successfully");
       console.log(channelName);
       this.client.write(`join #${channelName}\r\n`);
-    } else {
-      setTimeout(() => {
-        this.joinChannel(channelName);
-      }, 1000);
+      this.channels.push(channelName);
+      return;
     }
+    setTimeout(() => {
+      this.joinChannel(channelName);
+    }, 1000);
   }
 
   msgChannel(channelName: string, msg: string): void {
-    this.client.write(`privmsg #${channelName} : ${msg}\r\n`);
+    if (this.connectionStatus) {
+      if (this.channels.includes(channelName)) {
+        this.client.write(`privmsg #${channelName} : ${msg}\r\n`);
+      } else {
+        this.joinChannel(channelName);
+        setTimeout(() => {
+          this.msgChannel(channelName, msg);
+        }, 1000);
+      }
+      return;
+    }
+    setTimeout(() => {
+      this.msgChannel(channelName, msg);
+    }, 1000);
   }
 }
 
