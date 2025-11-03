@@ -57,8 +57,9 @@ class IRCClient implements Client {
       } else if (data.includes("MOTD")) {
         this.connectionStatus = true;
       } else if (data.includes("JOIN")) {
-        let channelName = data.toString("utf-8").split("#").pop();
+        let channelName = data.toString("utf-8").split("#").pop().replace("\r\n","");
         this.channels.push(channelName);
+        console.log(this.channels);
       } else {
         this.myEmitter.emit("data", data);
       }
@@ -77,6 +78,7 @@ class IRCClient implements Client {
 
   msgChannel(channelName: string, msg: string): void {
     if (this.connectionStatus) {
+      console.log("msg : " + this.channels);
       if (this.channels.includes(channelName)) {
         this.client.write(`privmsg #${channelName} : ${msg}\r\n`);
       } else {
