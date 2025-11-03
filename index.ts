@@ -43,27 +43,22 @@ class IRCClient implements Client {
         port: port,
       },
       () => {
-        console.log("connecting ....");
         this.client.write("CAP LS 302\r\n");
         this.client.write("PASS test123\r\n");
         this.client.write(`NICK ${nick}\r\n`);
         this.client.write(`USER ${username} 0 * :${realname}\r\n`);
         this.client.write("CAP END\r\n");
-        console.log("connecting done");
       },
     );
     this.client.on("data", (data: any) => {
-      console.log(data.toString("utf8"));
       if (data.includes("PING :")) {
         const token = data.toString().replace("PING :", "");
         this.client.write(`PONG ${token}\r\n`);
       } else if (data.includes("MOTD")) {
-        console.log("GOT MOTD");
         this.connectionStatus = true;
       } else if (data.includes("JOIN")) {
-        console.log("joined the room : " + data);
         let channelName = data.toString("utf-8").split("#").pop();
-        console.log("channel joined : " + channelName);
+        this.channels.push(channelName);
       } else {
         this.myEmitter.emit("data", data);
       }
@@ -72,9 +67,7 @@ class IRCClient implements Client {
 
   joinChannel(channelName: string): void {
     if (this.connectionStatus) {
-      console.log(channelName);
       this.client.write(`join #${channelName}\r\n`);
-      this.channels.push(channelName);
       return;
     }
     setTimeout(() => {
