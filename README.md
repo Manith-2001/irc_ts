@@ -9,6 +9,13 @@ path like this :
     "irc_ts": "file:path/to/irc_ts"
 ```
 
+and build the project :
+
+```bash
+pnpm i
+pnpm build
+```
+
 or npm link it :
 
 ```bash
@@ -79,6 +86,6 @@ This is the abstract provided by the Internet Engineering Task Force (IETF). Bas
 There are obvious cons to this a glaringly obvious one is that if your client is not online then all the messages sent to you client or to a channel you were a part of is gone in the wind. There are ways people have found work arounds one is an [IRC Bouncer](https://www.reddit.com/r/irc/comments/35vcth/comment/cr86hcs/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 
 TODO's :
+
 - [ ] Add a password option when creating a client
 - [ ] write tests
-
