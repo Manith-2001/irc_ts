@@ -77,7 +77,6 @@ export class IRCClient implements Client {
           msg: msg,
         };
         let payloadStr = JSON.stringify(payload);
-        //msg received : :gxultra!~gxultra@2401:4900:6478:9f62:1cdb:ea1a:11d:ee6d PRIVMSG #manith :hello
         this.myEmitter.emit("msg", payloadStr);
       } else {
         this.myEmitter.emit("data", data);

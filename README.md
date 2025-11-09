@@ -37,7 +37,7 @@ client.joinChannel("yourChannel");
 
 As per the IRC spec if the channel doesn't exist this will create the channel for you.
 
-Now you have joined the channle but how about sending a message to the channel, well you can do it like this :
+Now you have joined the channel but how about sending a message to the channel, well you can do it like this :
 
 ```ts
 client.msgChannel("yourChannel", "Hello world");
@@ -56,7 +56,7 @@ client.myEmitter.addListener("msg", function (message: string) {
 
 So your question would be how to distinguish a channel message from a message directly from a user well that is simple if the sender has `#` then its from a channel for example `#yourChannel` but if its from a user it will look something like this `user`
 
-Now this library is still in a very primitive stage so there will be many Commands of IRC that the moduke wont be handling but for that I have left a provision :
+Now this library is still in a very primitive stage so there will be many Commands of IRC that the module wont be handling but for that I have left a provision :
 
 ```ts
 client.myEmitter.addListener("data", function (message: any) {
