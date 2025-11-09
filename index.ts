@@ -1,6 +1,5 @@
-import net = require("net");
-import EventEmitter = require("events");
-import Socket = require("net");
+import * as EventEmitter from "events";
+import * as net from "net"
 
 interface Client {
   server: string;
@@ -10,13 +9,18 @@ interface Client {
   realname: string;
 }
 
-class IRCClient implements Client {
+export interface MessagePayload {
+  sender: string;
+  msg: string;
+}
+
+export class IRCClient implements Client {
   server: string;
   port: number;
   nick: string;
   username: string;
   realname: string;
-  client: Socket.Socket;
+  client: net.Socket;
   myEmitter: EventEmitter;
   private connectionStatus: boolean;
   private channels: string[];
@@ -35,7 +39,7 @@ class IRCClient implements Client {
     this.nick = nick;
     this.username = username;
     this.realname = realname;
-    this.myEmitter = new EventEmitter();
+    this.myEmitter = new EventEmitter.EventEmitter();
 
     this.client = net.connect(
       {
@@ -57,9 +61,24 @@ class IRCClient implements Client {
       } else if (data.includes("MOTD")) {
         this.connectionStatus = true;
       } else if (data.includes("JOIN")) {
-        let channelName = data.toString("utf-8").split("#").pop().replace("\r\n","");
+        let channelName = data
+          .toString("utf-8")
+          .split("#")
+          .pop()
+          .replace("\r\n", "");
         this.channels.push(channelName);
-        console.log(this.channels);
+      } else if (data.includes("PRIVMSG")) {
+        let sender = data
+          .toString("utf-8")
+          .substring(data.indexOf("PRIVMSG") + 8, data.lastIndexOf(":"));
+        let msg = data.toString("utf-8").split(":").pop().replace("\r\n", "");
+        const payload: MessagePayload = {
+          sender: sender,
+          msg: msg,
+        };
+        let payloadStr = JSON.stringify(payload);
+        //msg received : :gxultra!~gxultra@2401:4900:6478:9f62:1cdb:ea1a:11d:ee6d PRIVMSG #manith :hello
+        this.myEmitter.emit("msg", payloadStr);
       } else {
         this.myEmitter.emit("data", data);
       }
@@ -78,7 +97,6 @@ class IRCClient implements Client {
 
   msgChannel(channelName: string, msg: string): void {
     if (this.connectionStatus) {
-      console.log("msg : " + this.channels);
       if (this.channels.includes(channelName)) {
         this.client.write(`privmsg #${channelName} : ${msg}\r\n`);
       } else {
@@ -95,4 +113,3 @@ class IRCClient implements Client {
   }
 }
 
-export = { IRCClient };
